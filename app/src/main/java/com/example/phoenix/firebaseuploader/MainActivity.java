@@ -24,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     StorageReference fileName;
     Uri uri;
     String fileExtension;
+    File file;
     SimpleDateFormat sdf;
     static ArrayList<ImageDetails> arrayList = new ArrayList<>();
     static String uid;
@@ -79,16 +82,17 @@ public class MainActivity extends AppCompatActivity {
             progressDialog.setMessage("Uploading.....");
             uri = data.getData();
             progressDialog.show();
+            file = new File(uri.getPath());
             imageView.setImageURI(uri);
             fileExtension = GetFileExtension.GetFileExtensions(uri, MainActivity.this);
-            fileName = mStorage.child("Photos/" + uid + "/" + uri.getLastPathSegment() + "." + fileExtension);
+            fileName = mStorage.child("Photos/" + uid + "/" + file.getName() + "." + fileExtension);
             fileName.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     progressDialog.dismiss();
                     Toast.makeText(MainActivity.this, "Done", Toast.LENGTH_SHORT).show();
                     ImageDetails imageDetails = new ImageDetails();
-                    imageDetails.setName(uri.getLastPathSegment() + "." + fileExtension);
+                    imageDetails.setName(file.getName() + "." + fileExtension);
                     imageDetails.setUrl(taskSnapshot.getDownloadUrl().toString());
                     myRef.child(sdf.format(new Date())).setValue(imageDetails);
                 }
