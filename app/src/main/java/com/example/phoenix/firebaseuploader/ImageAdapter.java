@@ -13,12 +13,12 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return MainActivity.arrayList.size();
+        return ImageActivity.arrayList.size();
     }
 
     @Override
     public ImageDetails getItem(int i) {
-        return MainActivity.arrayList.get(i);
+        return ImageActivity.arrayList.get(i);
     }
 
     @Override
