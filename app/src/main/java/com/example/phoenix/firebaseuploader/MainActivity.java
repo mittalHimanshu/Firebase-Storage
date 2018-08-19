@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,17 +43,21 @@ public class MainActivity extends AppCompatActivity {
     String fileExtension;
     SimpleDateFormat sdf;
     static ArrayList<ImageDetails> arrayList = new ArrayList<>();
-
+    static String uid;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         storage = FirebaseStorage.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         database = FirebaseDatabase.getInstance();
         sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         progressDialog = new ProgressDialog(this);
         button = findViewById(R.id.button2);
-        myRef = database.getReference();
+        uid = currentUser.getUid();
+        myRef = database.getReference().child(uid);
         imageView = findViewById(R.id.imageView);
         mStorage = FirebaseStorage.getInstance().getReference();
         button.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             progressDialog.show();
             imageView.setImageURI(uri);
             fileExtension = GetFileExtension.GetFileExtensions(uri, MainActivity.this);
-            fileName = mStorage.child("Photos/" + uri.getLastPathSegment() + "." + fileExtension);
+            fileName = mStorage.child("Photos/" + uid + "/" + uri.getLastPathSegment() + "." + fileExtension);
             fileName.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -89,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -97,6 +103,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void showImages(View view) {
         new SendFeedback().execute();
+    }
+
+    public void logoutUser(View view) {
+
+        FirebaseAuth.getInstance().signOut();
+        Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+
     }
 
     private class SendFeedback extends AsyncTask<String, Integer, String>{

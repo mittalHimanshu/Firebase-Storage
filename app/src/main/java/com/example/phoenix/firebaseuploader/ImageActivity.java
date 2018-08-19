@@ -40,7 +40,7 @@ public class ImageActivity extends AppCompatActivity {
                 MainActivity.mStorage = MainActivity.storage.getReferenceFromUrl("gs://fir-uploader-fca87.appspot.com");
                 progressDialog.setMessage("Downloading.....");
                 progressDialog.show();
-                MainActivity.mStorage.child("Photos/"+imageDetails.getName()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                MainActivity.mStorage.child("Photos/"+MainActivity.uid+"/"+imageDetails.getName()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
                     public void onSuccess(byte[] bytes) {
                         String path= Environment.getExternalStorageDirectory() + File.separator + imageDetails.getName();
