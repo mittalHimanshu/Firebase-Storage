@@ -69,7 +69,7 @@ public class ImageActivity extends AppCompatActivity {
         myRef = database.getReference().child(uid);
         mStorage = FirebaseStorage.getInstance().getReference();
         listView1 = findViewById(R.id.listView);
-        progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(ImageActivity.this);
         imageAdapter = new ImageAdapter();
         listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
